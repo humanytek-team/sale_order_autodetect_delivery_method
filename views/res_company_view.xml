@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+      <record model="ir.ui.view" id="view_company_sale_conf_autodetect_delivery_method">
+          <field name="name">res.company.form.inherit.autodetect.delivery.method</field>
+          <field name="inherit_id" ref="sale.view_company_inherit_form2"/>
+          <field name="model">res.company</field>
+          <field name="arch" type="xml">
+              <xpath expr="//group[@name='sale_grp']" position="inside">
+                  <group>
+                    <field name="margin_total_volume_delivery_method" />
+                    <field name="margin_total_weight_delivery_method" />
+                  </group>
+              </xpath>
+          </field>
+      </record>
+
+    </data>
+</openerp>
