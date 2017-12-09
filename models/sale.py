@@ -6,8 +6,6 @@ import operator
 import random
 
 from openerp import api, fields, models
-import logging
-_logger = logging.getLogger(__name__)
 
 OPERATORS = {
     '==': operator.eq,
@@ -19,7 +17,7 @@ OPERATORS = {
 
 
 class SaleOrder(models.Model):
-    _inherit='sale.order'
+    _inherit = 'sale.order'
 
     @api.multi
     def button_dummy(self):
@@ -41,7 +39,7 @@ class SaleOrder(models.Model):
 
             if line.product_id.volume > 0:
                 volume_line = (line.product_id.volume *
-                    line.product_uom_qty)
+                               line.product_uom_qty)
 
                 if margin_total_volume_delivery_method > 0:
                     volume_line = volume_line + (
@@ -51,7 +49,7 @@ class SaleOrder(models.Model):
 
             if line.product_id.weight > 0:
                 weight_line = (line.product_id.weight *
-                    line.product_uom_qty)
+                               line.product_uom_qty)
 
                 if margin_total_weight_delivery_method > 0:
                     weight_line = weight_line + (
@@ -97,7 +95,7 @@ class SaleOrder(models.Model):
                                 delivery_carriers_selected.append({
                                     'dc': dc,
                                     'price': rule.list_base_price,
-                                    })
+                                })
 
         if highest_value_weight > 0:
 
@@ -129,16 +127,16 @@ class SaleOrder(models.Model):
                                 delivery_carriers_selected.append({
                                     'dc': dc,
                                     'price': rule.list_base_price,
-                                    })
+                                })
 
         if delivery_carriers_selected:
 
             min_price = min([
                 dc['price']
                 for dc in delivery_carriers_selected
-                ])
+            ])
 
-            delivery_carriers_selected =  [
+            delivery_carriers_selected = [
                 dc['dc']
                 for dc in delivery_carriers_selected
                 if dc['price'] == min_price]
