@@ -22,6 +22,8 @@ class SaleOrder(models.Model):
     @api.multi
     def button_dummy(self):
 
+        super(SaleOrder, self).button_dummy()
+
         DeliveryCarrier = self.env['delivery.carrier']
         all_delivery_carriers = DeliveryCarrier.search([])
         delivery_carriers_customer = all_delivery_carriers.filtered(
@@ -143,4 +145,6 @@ class SaleOrder(models.Model):
 
             self.carrier_id = random.choice(delivery_carriers_selected)
 
-        super(SaleOrder, self).button_dummy()
+        else:
+
+            self.carrier_id = False

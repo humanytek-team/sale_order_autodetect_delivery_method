@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [9.0.1.0.1] - 2017-12-09
+### changed
+- Fix bug in inheritance of method button_dummy in model sale.order.
+
 
 ## [9.0.1.0.0] - 2017-12-09
 ### added
