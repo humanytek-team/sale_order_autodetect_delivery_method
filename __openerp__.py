@@ -4,7 +4,7 @@
 
 {
     'name': 'Autodetects delivery method in sale orders',
-    'version': '9.0.1.0.0',
+    'version': '9.0.1.0.1',
     'category': 'Sales',
     'author': 'Humanytek',
     'website': "http://www.humanytek.com",
