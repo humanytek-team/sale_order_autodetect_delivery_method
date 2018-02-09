@@ -5,7 +5,7 @@
 import operator
 import random
 
-from openerp import api, fields, models
+from openerp import api, models
 
 OPERATORS = {
     '==': operator.eq,
@@ -20,9 +20,8 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     @api.multi
-    def button_dummy(self):
-
-        super(SaleOrder, self).button_dummy()
+    def _get_delivery_carrier_id(self):
+        """Returns carrier selected"""
 
         DeliveryCarrier = self.env['delivery.carrier']
         all_delivery_carriers = DeliveryCarrier.search([])
@@ -130,7 +129,6 @@ class SaleOrder(models.Model):
                                     'dc': dc,
                                     'price': rule.list_base_price,
                                 })
-
         if delivery_carriers_selected:
 
             min_price = min([
@@ -143,8 +141,16 @@ class SaleOrder(models.Model):
                 for dc in delivery_carriers_selected
                 if dc['price'] == min_price]
 
-            self.carrier_id = random.choice(delivery_carriers_selected)
+            carrier_id = random.choice(delivery_carriers_selected)
 
         else:
 
-            self.carrier_id = False
+            carrier_id = False
+
+        return carrier_id
+
+    @api.multi
+    def button_dummy(self):
+        super(SaleOrder, self).button_dummy()
+
+        self.carrier_id = self._get_delivery_carrier_id()
