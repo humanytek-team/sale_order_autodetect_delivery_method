@@ -20,11 +20,15 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     @api.multi
-    def _get_delivery_carrier_id(self):
+    def _get_delivery_carrier_id(self, website=False):
         """Returns carrier selected"""
 
+        if not website:
+            domain = []
+        else:
+            domain = [('website_published', '=', True)]
         DeliveryCarrier = self.env['delivery.carrier']
-        all_delivery_carriers = DeliveryCarrier.search([])
+        all_delivery_carriers = DeliveryCarrier.search(domain)
         delivery_carriers_customer = all_delivery_carriers.filtered(
             lambda dc: dc.verify_carrier(self.partner_id)
         )
