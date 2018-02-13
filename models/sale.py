@@ -20,18 +20,18 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     @api.multi
-    def _get_delivery_carrier_id(self, website=False):
+    def _get_delivery_carrier_id(self, delivery_carriers_ids=False):
         """Returns carrier selected"""
 
-        if not website:
-            domain = []
-        else:
-            domain = [('website_published', '=', True)]
         DeliveryCarrier = self.env['delivery.carrier']
-        all_delivery_carriers = DeliveryCarrier.search(domain)
-        delivery_carriers_customer = all_delivery_carriers.filtered(
-            lambda dc: dc.verify_carrier(self.partner_id)
-        )
+        if not delivery_carriers_ids:
+            all_delivery_carriers = DeliveryCarrier.search([])
+            delivery_carriers_customer = all_delivery_carriers.filtered(
+                lambda dc: dc.verify_carrier(self.partner_id)
+            )
+        else:
+            delivery_carriers_customer = DeliveryCarrier.browse(
+                delivery_carriers_ids)
 
         volume_total = float()
         weight_total = float()
