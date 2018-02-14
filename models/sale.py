@@ -20,24 +20,22 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     @api.multi
-    def _get_delivery_carrier_id(self, delivery_carriers_ids=False):
+    def _get_delivery_carrier_id(self, delivery_carriers_ids):
         """Returns carrier selected"""
 
         DeliveryCarrier = self.env['delivery.carrier']
-        if not delivery_carriers_ids:
-            all_delivery_carriers = DeliveryCarrier.search([])
-            delivery_carriers_customer = all_delivery_carriers.filtered(
-                lambda dc: dc.verify_carrier(self.partner_id)
-            )
-        else:
-            delivery_carriers_customer = delivery_carriers_ids
+        delivery_carriers_customer = list()
+
+        for dc_id in delivery_carriers_ids:
+            dc = DeliveryCarrier.browse(dc_id)
+
+            if dc.verify_carrier(self.partner_id):
+                delivery_carriers_customer.append(dc)
 
         volume_total = float()
         weight_total = float()
-        margin_total_weight_delivery_method = \
-            self.env.user.company_id.margin_total_weight_delivery_method
-        margin_total_volume_delivery_method = \
-            self.env.user.company_id.margin_total_volume_delivery_method
+        margin_total_weight_delivery_method = self.env.user.company_id.margin_total_weight_delivery_method
+        margin_total_volume_delivery_method = self.env.user.company_id.margin_total_volume_delivery_method
 
         for line in self.order_line:
 
@@ -71,12 +69,7 @@ class SaleOrder(models.Model):
 
         if highest_value_volume > 0:
 
-            for dc in delivery_carriers_customer:
-
-                if isinstance(dc, int):
-                    delivery_carrier = DeliveryCarrier.browse(dc)
-                else:
-                    delivery_carrier = dc
+            for delivery_carrier in delivery_carriers_customer:
 
                 if delivery_carrier.delivery_type == 'base_on_rule':
 
@@ -96,8 +89,8 @@ class SaleOrder(models.Model):
                                 if rule.list_base_price < \
                                         dc_in_selected['price']:
 
-                                    dc_in_selected['price'] = \
-                                        rule.list_base_price
+                                    dc_in_selected[
+                                        'price'] = rule.list_base_price
 
                             except StopIteration:
 
@@ -108,12 +101,7 @@ class SaleOrder(models.Model):
 
         if highest_value_weight > 0:
 
-            for dc in delivery_carriers_customer:
-
-                if isinstance(dc, int):
-                    delivery_carrier = DeliveryCarrier.browse(dc)
-                else:
-                    delivery_carrier = dc
+            for delivery_carrier in delivery_carriers_customer:
 
                 if delivery_carrier.delivery_type == 'base_on_rule':
 
@@ -133,8 +121,8 @@ class SaleOrder(models.Model):
                                 if rule.list_base_price < \
                                         dc_in_selected['price']:
 
-                                    dc_in_selected['price'] = \
-                                        rule.list_base_price
+                                    dc_in_selected[
+                                        'price'] = rule.list_base_price
 
                             except StopIteration:
 
@@ -166,4 +154,14 @@ class SaleOrder(models.Model):
     def button_dummy(self):
         super(SaleOrder, self).button_dummy()
 
-        self.carrier_id = self._get_delivery_carrier_id()
+        sql = ('SELECT id '
+               'FROM delivery_carrier ')
+        self.env.cr.execute(sql)
+        delivery_carriers_ids = [
+            dc[0]
+            for dc in self.env.cr.fetchall()
+            if dc
+        ]
+
+        self.carrier_id = self._get_delivery_carrier_id(
+            delivery_carriers_ids)
