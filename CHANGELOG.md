@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [9.0.1.0.5] - 2018-02-14
+### changed
+- Fix: Remove browse over all ids of available carriers and browse over one record in for loop.
+
 ## [9.0.1.0.4] - 2018-02-13
 ### changed
 - Fix: Refactoring to method _get_delivery_carrier_id(), accepting available carriers ids as parameter for avoid have to querying by them.
