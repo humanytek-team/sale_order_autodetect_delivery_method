@@ -115,8 +115,6 @@ class SaleOrder(models.Model):
                 else:
                     delivery_carrier = dc
 
-                delivery_carrier = DeliveryCarrier.browse(dc)
-
                 if delivery_carrier.delivery_type == 'base_on_rule':
 
                     for rule in delivery_carrier.price_rule_ids:
