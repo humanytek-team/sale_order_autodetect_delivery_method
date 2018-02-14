@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [9.0.1.0.6] - 2018-02-14
+### changed
+- Fix: Remove browse over all ids of available carriers and browse over one record in for loop.
+
 ## [9.0.1.0.5] - 2018-02-14
 ### changed
 - Fix: Remove browse over all ids of available carriers and browse over one record in for loop.
