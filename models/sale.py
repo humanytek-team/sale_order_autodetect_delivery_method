@@ -30,8 +30,7 @@ class SaleOrder(models.Model):
                 lambda dc: dc.verify_carrier(self.partner_id)
             )
         else:
-            delivery_carriers_customer = DeliveryCarrier.browse(
-                delivery_carriers_ids)
+            delivery_carriers_customer = delivery_carriers_ids
 
         volume_total = float()
         weight_total = float()
@@ -74,9 +73,14 @@ class SaleOrder(models.Model):
 
             for dc in delivery_carriers_customer:
 
-                if dc.delivery_type == 'base_on_rule':
+                if isinstance(dc, int):
+                    delivery_carrier = DeliveryCarrier.browse(dc)
+                else:
+                    delivery_carrier = dc
 
-                    for rule in dc.price_rule_ids:
+                if delivery_carrier.delivery_type == 'base_on_rule':
+
+                    for rule in delivery_carrier.price_rule_ids:
 
                         if rule.variable == 'volume' and \
                                 OPERATORS[rule.operator](
@@ -87,7 +91,7 @@ class SaleOrder(models.Model):
                                 dc_in_selected = (
                                     dc_data for dc_data in
                                     delivery_carriers_selected
-                                    if dc_data['dc'] == dc).next()
+                                    if dc_data['dc'] == delivery_carrier).next()
 
                                 if rule.list_base_price < \
                                         dc_in_selected['price']:
@@ -98,7 +102,7 @@ class SaleOrder(models.Model):
                             except StopIteration:
 
                                 delivery_carriers_selected.append({
-                                    'dc': dc,
+                                    'dc': delivery_carrier,
                                     'price': rule.list_base_price,
                                 })
 
@@ -106,9 +110,16 @@ class SaleOrder(models.Model):
 
             for dc in delivery_carriers_customer:
 
-                if dc.delivery_type == 'base_on_rule':
+                if isinstance(dc, int):
+                    delivery_carrier = DeliveryCarrier.browse(dc)
+                else:
+                    delivery_carrier = dc
 
-                    for rule in dc.price_rule_ids:
+                delivery_carrier = DeliveryCarrier.browse(dc)
+
+                if delivery_carrier.delivery_type == 'base_on_rule':
+
+                    for rule in delivery_carrier.price_rule_ids:
 
                         if rule.variable == 'weight' and \
                                 OPERATORS[rule.operator](
@@ -119,7 +130,7 @@ class SaleOrder(models.Model):
                                 dc_in_selected = (
                                     dc_data for dc_data in
                                     delivery_carriers_selected
-                                    if dc_data['dc'] == dc).next()
+                                    if dc_data['dc'] == delivery_carrier).next()
 
                                 if rule.list_base_price < \
                                         dc_in_selected['price']:
@@ -130,7 +141,7 @@ class SaleOrder(models.Model):
                             except StopIteration:
 
                                 delivery_carriers_selected.append({
-                                    'dc': dc,
+                                    'dc': delivery_carrier,
                                     'price': rule.list_base_price,
                                 })
         if delivery_carriers_selected:
