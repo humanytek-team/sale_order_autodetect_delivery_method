@@ -26,12 +26,6 @@ class SaleOrder(models.Model):
         DeliveryCarrier = self.env['delivery.carrier']
         delivery_carriers_customer = list()
 
-        for dc_id in delivery_carriers_ids:
-            dc = DeliveryCarrier.browse(dc_id)
-
-            if dc.verify_carrier(self.partner_id):
-                delivery_carriers_customer.append(dc)
-
         volume_total = float()
         weight_total = float()
         margin_total_weight_delivery_method = self.env.user.company_id.margin_total_weight_delivery_method
@@ -69,67 +63,75 @@ class SaleOrder(models.Model):
 
         if highest_value_volume > 0:
 
-            for delivery_carrier in delivery_carriers_customer:
+            for dc_id in delivery_carriers_ids:
 
-                if delivery_carrier.delivery_type == 'base_on_rule':
+                delivery_carrier = DeliveryCarrier.browse(dc_id)
 
-                    for rule in delivery_carrier.price_rule_ids:
+                if delivery_carrier.verify_carrier(self.partner_id):
 
-                        if rule.variable == 'volume' and \
-                                OPERATORS[rule.operator](
-                                    highest_value_volume, rule.max_value):
+                    if delivery_carrier.delivery_type == 'base_on_rule':
 
-                            try:
+                        for rule in delivery_carrier.price_rule_ids:
 
-                                dc_in_selected = (
-                                    dc_data for dc_data in
-                                    delivery_carriers_selected
-                                    if dc_data['dc'] == delivery_carrier).next()
+                            if rule.variable == 'volume' and \
+                               OPERATORS[rule.operator](
+                                   highest_value_volume, rule.max_value):
 
-                                if rule.list_base_price < \
-                                        dc_in_selected['price']:
+                                try:
 
-                                    dc_in_selected[
-                                        'price'] = rule.list_base_price
+                                    dc_in_selected = (
+                                        dc_data for dc_data in
+                                        delivery_carriers_selected
+                                        if dc_data['dc'] == delivery_carrier).next()
 
-                            except StopIteration:
+                                    if rule.list_base_price < \
+                                       dc_in_selected['price']:
 
-                                delivery_carriers_selected.append({
-                                    'dc': delivery_carrier,
-                                    'price': rule.list_base_price,
-                                })
+                                        dc_in_selected[
+                                            'price'] = rule.list_base_price
+
+                                except StopIteration:
+
+                                    delivery_carriers_selected.append({
+                                        'dc': delivery_carrier,
+                                        'price': rule.list_base_price,
+                                    })
 
         if highest_value_weight > 0:
 
-            for delivery_carrier in delivery_carriers_customer:
+            for dc_id in delivery_carriers_ids:
 
-                if delivery_carrier.delivery_type == 'base_on_rule':
+                delivery_carrier = DeliveryCarrier.browse(dc_id)
 
-                    for rule in delivery_carrier.price_rule_ids:
+                if delivery_carrier.verify_carrier(self.partner_id):
 
-                        if rule.variable == 'weight' and \
-                                OPERATORS[rule.operator](
-                                    highest_value_weight, rule.max_value):
+                    if delivery_carrier.delivery_type == 'base_on_rule':
 
-                            try:
+                        for rule in delivery_carrier.price_rule_ids:
 
-                                dc_in_selected = (
-                                    dc_data for dc_data in
-                                    delivery_carriers_selected
-                                    if dc_data['dc'] == delivery_carrier).next()
+                            if rule.variable == 'weight' and \
+                               OPERATORS[rule.operator](
+                                   highest_value_weight, rule.max_value):
 
-                                if rule.list_base_price < \
-                                        dc_in_selected['price']:
+                                try:
 
-                                    dc_in_selected[
-                                        'price'] = rule.list_base_price
+                                    dc_in_selected = (
+                                        dc_data for dc_data in
+                                        delivery_carriers_selected
+                                        if dc_data['dc'] == delivery_carrier).next()
 
-                            except StopIteration:
+                                    if rule.list_base_price < \
+                                       dc_in_selected['price']:
 
-                                delivery_carriers_selected.append({
-                                    'dc': delivery_carrier,
-                                    'price': rule.list_base_price,
-                                })
+                                        dc_in_selected[
+                                            'price'] = rule.list_base_price
+
+                                except StopIteration:
+
+                                    delivery_carriers_selected.append({
+                                        'dc': delivery_carrier,
+                                        'price': rule.list_base_price,
+                                    })
         if delivery_carriers_selected:
 
             min_price = min([
